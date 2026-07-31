@@ -183,5 +183,12 @@ public class TestRunner {
         String loaded = stack.loadLastCheckpoint();
         check("boundary: capacity 1 load returns A", "A".equals(loaded));
         check("boundary: capacity 1 becomes empty after load", stack.isEmpty());
+
+        BoundedStack almostFull = new BoundedStack(3);
+
+        almostFull.saveCheckpoint("A");
+        almostFull.saveCheckpoint("B");
+
+        check("boundary: size 2 of 3 is not full", !almostFull.isFull());
     }
 }
