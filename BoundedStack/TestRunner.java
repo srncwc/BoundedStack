@@ -20,6 +20,7 @@ public class TestRunner {
         testObservers();
         testProducer();
         testInvalidOperations();
+        testBoundary();
         System.out.println("====================");
         System.out.printf("PASS %d / FAIL %d%n", pass, fail);
         System.out.println("====================");
@@ -37,15 +38,14 @@ public class TestRunner {
         stack.saveCheckpoint("first_check") ;
         check("save: size 1", stack.size() == 1) ;
         check("save: stack is not empty", !stack.isEmpty());
-        check("save: latest checkpoint is first_check", stack.peekLatestCheckpoint().equals("first_check")) ;
+        check("save: latest checkpoint is first_check", "first_check".equals(stack.peekLatestCheckpoint())) ;
         stack.saveCheckpoint("test_check");
         check("save: save another checkpoint and size become 2", stack.size() == 2) ; 
         check("save: lastest checkpoint become test_check", stack.peekLatestCheckpoint().equals("test_check")) ;
 
-        // stack.saveCheckpoint("check_C");
-        // check("save: stack is full", stack.isFull());
+        stack.saveCheckpoint("check_C");
+        check("save: stack is full", stack.isFull());
 
-        // stack.saveCheckpoint("D");  throw
     }
 
     private static void testLoad(){
@@ -171,5 +171,17 @@ public class TestRunner {
         }
         check("invalid: peek when empty throws IllegalStateException", threw);
     }
+    private static void testBoundary() {
+        BoundedStack stack = new BoundedStack(1);
+        check("boundary: capacity 1 starts empty", stack.isEmpty());
+        check("boundary: capacity 1 starts not full", !stack.isFull());
+        
+        stack.saveCheckpoint("A");
+        check("boundary: capacity 1 becomes full after one save", stack.isFull());
+        check("boundary: capacity 1 size is 1", stack.size() == 1);
 
+        String loaded = stack.loadLastCheckpoint();
+        check("boundary: capacity 1 load returns A", "A".equals(loaded));
+        check("boundary: capacity 1 becomes empty after load", stack.isEmpty());
+    }
 }
