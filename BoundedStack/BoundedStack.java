@@ -90,6 +90,17 @@ public class BoundedStack{
      * @throws IllegalStateException ถ้า stack เต็ม
     */
     public void saveCheckpoint(String checkpoint) {
+        if (checkpoint == null) {
+            throw new IllegalArgumentException();
+        }
+
+        if (isFull()) {
+            throw new IllegalStateException();
+        }
+        checkpoints[size] = checkpoint;
+        size++;
+
+        checkRep();
     }
     
    
@@ -109,7 +120,14 @@ public class BoundedStack{
      * @throws IllegalStateException ถ้า stack ว่าง
     */
     public String loadLastCheckpoint() {
-        return null;
+        if(isEmpty()) throw new IllegalStateException();
+
+        String top = checkpoints[size - 1] ;
+        checkpoints[size - 1] = null ;
+        size--;
+        checkRep();
+
+        return top;
     }
 
 
@@ -127,7 +145,9 @@ public class BoundedStack{
      * @throws IllegalStateException ถ้า stack ว่าง
     */
     public String peekLatestCheckpoint() {
-        return null;
+        if (isEmpty()) throw new IllegalStateException();
+        
+        return checkpoints[size - 1];
     }
 
     /**
@@ -139,7 +159,7 @@ public class BoundedStack{
      * @return จำนวน checkpoint ปัจจุบัน
     */
     public int size() {
-        return 0;
+        return size;
     }
 
     /**
@@ -151,7 +171,7 @@ public class BoundedStack{
      * @return true ถ้าไม่มี checkpoint, ไม่งั้น false
     */
     public boolean isEmpty() {
-        return false;
+        return size == 0; // if size == 0 return true, if not return false
     }
 
     /**
@@ -163,7 +183,7 @@ public class BoundedStack{
      * @return true ถ้าจำนวน checkpoint เท่ากับ capacity, ไม่งั้น false
     */
     public boolean isFull() {
-        return false;
+        return size == checkpoints.length; // if equal == true, if not == false
     }
 
     // ===== Producer =====    
@@ -181,6 +201,7 @@ public class BoundedStack{
      */
 
     public BoundedStack copy(){
-        return null ;
-    }
+        BoundedStack copied = new BoundedStack(checkpoints.length);
+        for (int i = 0; i < size; i++) copied.saveCheckpoint(checkpoints[i]);
+        return copied;    }
 }
