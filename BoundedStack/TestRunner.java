@@ -16,7 +16,8 @@ public class TestRunner {
     public static void main(String[] args) {
         // testCreator();
         // testSave();
-        testLoad();
+        // testLoad();
+        testObservers();
         System.out.println("====================");
         System.out.printf("PASS %d / FAIL %d%n", pass, fail);
         System.out.println("====================");
@@ -66,15 +67,43 @@ public class TestRunner {
         check("load: size decreases to 0", stack.size() == 0);
         check("load: stack is empty", stack.isEmpty());
     }
+
     private static void testObservers(){
-        
+        BoundedStack stack = new BoundedStack(3);
+        check("observer: new stack size is 0", stack.size() == 0);
+        check("observer: new stack is empty", stack.isEmpty());
+        check("observer: new stack is not full", !stack.isFull());
+
+        stack.saveCheckpoint("A");
+        stack.saveCheckpoint("B");
+
+        int sizeBeforePeek = stack.size();
+        check("observer: peek returns B", "B".equals(stack.peekLatestCheckpoint()));
+        check("observer: peek does not change size", stack.size() == sizeBeforePeek);
+
+        stack.saveCheckpoint("C");
+        check("observer: stack is full", stack.isFull());
 
         }
+
     private static void testProducer(){
+        BoundedStack original = new BoundedStack(3);
+        original.saveCheckpoint("A");
+        original.saveCheckpoint("B");
+
+        BoundedStack copied = original.copy();
+        check("producer: copy has same size", copied.size() == original.size());
+        check("producer: copy has same top", copied.peekLatestCheckpoint().equals(original.peekLatestCheckpoint()));
+
+        copied.saveCheckpoint("C");
+        check("producer: copy keeps same capacity", copied.isFull());
+        check("producer: changing copy does not change original size", original.size() == 2);
+        check("producer: original top is still B", "B".equals(original.peekLatestCheckpoint()));
+        
+
+        copied.loadLastCheckpoint(); // remove C out of stack 
+        check("producer: modifying copy does not affect original", original.size() == 2 && "B".equals(original.peekLatestCheckpoint()));
 
     }
-    private static void testRepExposure(){
-
-    }
-
+    // Delete testRep bc String is immutable
 }
