@@ -14,8 +14,8 @@ public class TestRunner {
     }
 
     public static void main(String[] args) {
-        testCreator();
-        
+        // testCreator();
+        testSave();
         System.out.println("====================");
         System.out.printf("PASS %d / FAIL %d%n", pass, fail);
         System.out.println("====================");
@@ -29,13 +29,31 @@ public class TestRunner {
     }
 
     private static void testSave(){
-        // BoundedStack stack = new BoundedStack(3) ; 
-        // stack.saveCheckpoint("first_check") ;
-        // check("save: size 1", stack.size() == 1) ;
+        BoundedStack stack = new BoundedStack(3) ; 
+        stack.saveCheckpoint("first_check") ;
+        check("save: size 1", stack.size() == 1) ;
+        check("save: stack is not empty", !stack.isEmpty());
+        check("save: latest checkpoint is first_check", stack.peekLatestCheckpoint().equals("first_check")) ;
+        stack.saveCheckpoint("test_check");
+        check("save: save another checkpoint and size become 2", stack.size() == 2) ; 
+        check("save: lastest checkpoint become test_check", stack.peekLatestCheckpoint().equals("test_check")) ;
 
+        // stack.saveCheckpoint("check_C");
+        // check("save: stack is full", stack.isFull());
+
+        // stack.saveCheckpoint("D");  throw
     }
+
     private static void testLoad(){
-        
+        // BoundedStack stack = new BoundedStack(3);
+        // stack.saveCheckpoint("A");
+        // stack.saveCheckpoint("B");
+        // stack.saveCheckpoint("C");
+
+        // String loaded = stack.loadLastCheckpoint();
+        // check("load: returns top C", "C".equals(loaded));
+
+
     }
     private static void testObservers(){
 
