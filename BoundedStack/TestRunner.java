@@ -14,10 +14,12 @@ public class TestRunner {
     }
 
     public static void main(String[] args) {
-        // testCreator();
-        // testSave();
-        // testLoad();
+        testCreator();
+        testSave();
+        testLoad();
         testObservers();
+        testProducer();
+        testInvalidOperations();
         System.out.println("====================");
         System.out.printf("PASS %d / FAIL %d%n", pass, fail);
         System.out.println("====================");
@@ -105,5 +107,69 @@ public class TestRunner {
         check("producer: modifying copy does not affect original", original.size() == 2 && "B".equals(original.peekLatestCheckpoint()));
 
     }
-    // Delete testRep bc String is immutable
+    
+    static void testInvalidOperations() {
+        // capacity = 0
+        boolean threw = false;
+        try {
+            new BoundedStack(0);
+        } catch (IllegalArgumentException e) {
+            threw = true;
+        }
+        check("invalid: capacity 0 throws IllegalArgumentException", threw);
+
+        // capacity < 0
+        threw = false;
+        try {
+            new BoundedStack(-1);
+        } catch (IllegalArgumentException e) {
+            threw = true;
+        }
+        check("invalid: negative capacity throws IllegalArgumentException", threw);
+
+        // save null
+        BoundedStack stack = new BoundedStack(3);
+
+        threw = false;
+        try {
+            stack.saveCheckpoint(null);
+        } catch (IllegalArgumentException e) {
+            threw = true;
+        }
+        check("invalid: save null throws IllegalArgumentException", threw);
+
+        // save when full
+        stack.saveCheckpoint("A");
+        stack.saveCheckpoint("B");
+        stack.saveCheckpoint("C");
+
+        threw = false;
+        try {
+            stack.saveCheckpoint("D");
+        } catch (IllegalStateException e) {
+            threw = true;
+        }
+        check("invalid: save when full throws IllegalStateException", threw);
+
+        // load when empty
+        BoundedStack emptyStack = new BoundedStack(3);
+
+        threw = false;
+        try {
+            emptyStack.loadLastCheckpoint();
+        } catch (IllegalStateException e) {
+            threw = true;
+        }
+        check("invalid: load when empty throws IllegalStateException", threw);
+
+        // peek when empty
+        threw = false;
+        try {
+            emptyStack.peekLatestCheckpoint();
+        } catch (IllegalStateException e) {
+            threw = true;
+        }
+        check("invalid: peek when empty throws IllegalStateException", threw);
+    }
+
 }
