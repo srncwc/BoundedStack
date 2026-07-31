@@ -159,7 +159,22 @@ Representation ทั้งหมดเป็น `private` และไม่ม
 
 # Testing
 
-
+- Empty Stack
+- Stack ที่มี checkpoint เดียว
+- Almost Full
+- Full Stack
+- Save เมื่อ Stack เต็ม
+- Load เมื่อ Stack ว่าง
+- Peek เมื่อ Stack ว่าง
+- Capacity = 1
+- Capacity = 0
+- Negative Capacity
+- Null Checkpoint
+- LIFO Order
+- `peekLatestCheckpoint()` ต้องไม่เปลี่ยน state
+- State ต้องไม่เปลี่ยนหลัง operation ที่ throw exception
+- Independence ของ `copy()`
+- `copy()` ต้องมี capacity เท่ากับ Stack เดิม
 
 # Development Process
 
